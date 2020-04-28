@@ -82,15 +82,6 @@ sequelize.sync().then(result => {
     .catch(err => console.log(err));
 
 
-/*User.create({
-    name: "Tom",
-    age: 35
-}).then(res=>{
-    console.log(res);
-}).catch(err=>console.log(err));
-User.findAll({raw:true}).then(users=>{
-    console.log(users);
-}).catch(err=>console.log(err ));*/
 
 app.use((req, res, next) => {
     res.header("Access-Control-Allow-Origin", "*");
@@ -207,11 +198,12 @@ app.post('/addNote', (req, res, next) => {
         theme: req.body.theme,
         message: req.body.theme,
     }).then((results) => {
-       // console.log(results['dataValues']['updatedAt']);
+      // console.log(results['dataValues']['updatedAt']);
         res.status(200).json({
             message: "Заметка добавленна",
             id: results['dataValues']['id'],
             updatedAt: results['dataValues']['updatedAt'],
+            createdAt: results['dataValues']['createdAt'],
         })
         //  console.log(results);
     }).catch(function (err) {
@@ -228,7 +220,13 @@ app.post('/addNote', (req, res, next) => {
 
 app.get('/getAllNotes/:login', (req, res, next) => {
 
-    Notes.findAll({where:{login: req.params.login }, raw: true })
+    Notes.findAll({where:{login: req.params.login },
+
+        order: [
+            ['id', 'DESC'],
+
+        ],
+        raw: true })
         .then(result=>{
             res.status(200).json({
                 //  messageError: err.sqlMessage ,
@@ -246,28 +244,27 @@ app.put('/updateNote/:id', (req, res, next) => {
             id: req.params.id
         }
     }).then(result=>{
-        res.status(200).json({
+      /*  res.status(200).json({
             //  messageError: err.sqlMessage ,
             update:"Успешно",
-        });
+        });*/
+
     }).catch(err=>console.log(err));
+
+
+    Notes.findOne({where: {id: req.params.id}})
+        .then(result=>{
+             //   console.log(result);
+            res.status(200).json({
+                //  messageError: err.sqlMessage,
+                update:"Успешно",
+                updatedAt:result['dataValues']['updatedAt'],
+            });
+        }).catch(err=>console.log(err));
 
 });
 
-app.put('/updateNote/:id', (req, res, next) => {
 
-    Notes.update({ theme: req.body.theme,message: req.body.message }, {
-        where: {
-            id: req.params.id
-        }
-    }).then(result=>{
-        res.status(200).json({
-            //  messageError: err.sqlMessage ,
-            update:"Успешно",
-        });
-    }).catch(err=>console.log(err));
-
-});
 
 
 
