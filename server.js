@@ -196,7 +196,7 @@ app.post('/addNote', (req, res, next) => {
     Notes.create({
         login: req.body.login,
         theme: req.body.theme,
-        message: req.body.theme,
+        message: req.body.message,
     }).then((results) => {
       // console.log(results['dataValues']['updatedAt']);
         res.status(200).json({
