@@ -13,11 +13,16 @@ app.use(bodyParser.json());
 
 app.use(morgan("dev"));
 
-
+/*
 const sequelize = new Sequelize("tester", "root", "", {
     dialect: "mysql",
     host: "localhost"
+});*/
+
+const sequelize = new Sequelize("notes", "postgres", "", {
+    dialect: "postgres"
 });
+
 const User = sequelize.define("users", {
     login: {
         type: Sequelize.STRING,
@@ -96,48 +101,56 @@ app.use((req, res, next) => {
 
 //Add User
 app.post("/addUser", function (req, res) {
-    if(req.body.password.length >4 ) {
 
+    if(req.body.login.trim().length >3 ) {
+        if (req.body.password.length > 4) {
+            if (req.body.confirmPassword === req.body.password) {
 
-        if (req.body.confirmPassword === req.body.password) {
+                bcrypt.hash(req.body.password, 10, function (err, hash) {
+                    if (!err) {
+                        passHash = hash;
 
-            bcrypt.hash(req.body.password, 10, function (err, hash) {
-                if (!err) {
-                    passHash = hash;
-
-                    User.create({
-                        login: req.body.login,
-                        email: req.body.email,
-                        password: passHash,
-                    }).then(() => {
-                        res.status(200).json({
-                            messageError: "Вы зарегистрированны",
-                            register: true,
-                        })
-                    }).catch(function (err) {
+                        User.create({
+                            login: req.body.login,
+                            email: req.body.email,
+                            password: passHash,
+                        }).then(() => {
                             res.status(200).json({
-                                messageError: err['errors'][0]['message'],
-                                register: false,
-                            });
-                            console.log(err['errors'][0]['message'])
-                        }
-                    )
-                } else {
-                    res.status(200).json({
-                        messageError: "Ошибка хеширования пароля",
-                        register: false,
-                    });
-                }
-            });
+                                messageError: "Вы зарегистрированны",
+                                register: true,
+                            })
+                        }).catch(function (err) {
+                              //  console.log(err);
+                                res.status(200).json({
+                                   // messageError: err['errors'][0]['message'],
+                                    messageError: err['parent']['sqlMessage'],
+                                    register: false,
+                                });
+                                console.log(err['parent']['sqlMessage']);
+                            }
+                        )
+                    } else {
+                        res.status(200).json({
+                            messageError: "Ошибка хеширования пароля",
+                            register: false,
+                        });
+                    }
+                });
+            } else {
+                res.status(200).json({
+                    messageError: "Пароли не совпадают",
+                    register: false,
+                });
+            }
         } else {
             res.status(200).json({
-                messageError: "Пароли не совпадают",
+                messageError: "Пароль должен содержать минимум 5 символов",
                 register: false,
             });
         }
     }else {
         res.status(200).json({
-            messageError: "Пароль должен содержать минимум 5 символов",
+            messageError: "Логин должен содержать минимум 4 символа",
             register: false,
         });
     }
@@ -192,18 +205,22 @@ app.get('/loginUser/:login/:password', (req, res, next) => {
 //add Notes
 
 app.post('/addNote', (req, res, next) => {
-
+    console.log(req.body.theme.trim());
+if(req.body.theme.trim()!==""||req.body.message.trim()!=="") {
     Notes.create({
         login: req.body.login,
-        theme: req.body.theme,
-        message: req.body.message,
+        theme: req.body.theme.trim(),
+        message: req.body.message.trim(),
     }).then((results) => {
-      // console.log(results['dataValues']['updatedAt']);
+        // console.log(results['dataValues']['updatedAt']);
         res.status(200).json({
             message: "Заметка добавленна",
             id: results['dataValues']['id'],
             updatedAt: results['dataValues']['updatedAt'],
             createdAt: results['dataValues']['createdAt'],
+
+            theme: results['dataValues']['theme'],
+            message: results['dataValues']['message'],
         })
         //  console.log(results);
     }).catch(function (err) {
@@ -214,7 +231,7 @@ app.post('/addNote', (req, res, next) => {
             console.log(err['errors'][0]['message'])
         }
     )
-
+}
 });
 
 
@@ -223,7 +240,7 @@ app.get('/getAllNotes/:login', (req, res, next) => {
     Notes.findAll({where:{login: req.params.login },
 
         order: [
-            ['id', 'DESC'],
+            ['createdAt', 'DESC'],
 
         ],
         raw: true })
@@ -239,28 +256,36 @@ app.get('/getAllNotes/:login', (req, res, next) => {
 
 app.put('/updateNote/:id', (req, res, next) => {
 
-    Notes.update({ theme: req.body.theme,message: req.body.message }, {
-        where: {
-            id: req.params.id
-        }
-    }).then(result=>{
-      /*  res.status(200).json({
-            //  messageError: err.sqlMessage ,
-            update:"Успешно",
-        });*/
-
-    }).catch(err=>console.log(err));
 
 
-    Notes.findOne({where: {id: req.params.id}})
-        .then(result=>{
-             //   console.log(result);
-            res.status(200).json({
-                //  messageError: err.sqlMessage,
-                update:"Успешно",
-                updatedAt:result['dataValues']['updatedAt'],
-            });
+    (async function () {
+        await Notes.update({ theme: req.body.theme,message: req.body.message }, {
+            where: {
+                id: req.params.id
+            }
+        }).then(result=>{
+            /*  res.status(200).json({
+                  //  messageError: err.sqlMessage ,
+                  update:"Успешно",
+              });*/
+
         }).catch(err=>console.log(err));
+
+
+
+        Notes.findOne({where: {id: req.params.id}})
+            .then(result=>{
+                console.log(result['dataValues']['updatedAt']);
+                console.log(result['_previousDataValues']['updatedAt']);
+                res.status(200).json({
+                    //  messageError: err.sqlMessage,
+                    update:"Заметка сохранена",
+                    updatedAt:result['dataValues']['updatedAt'],
+                });
+            }).catch(err=>console.log(err));
+
+    }());
+
 
 });
 
