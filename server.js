@@ -213,13 +213,13 @@ if(req.body.theme.trim()!==""||req.body.message.trim()!=="") {
     }).then((results) => {
         // console.log(results['dataValues']['updatedAt']);
         res.status(200).json({
-            message: "Заметка добавленна",
             id: results['dataValues']['id'],
             updatedAt: results['dataValues']['updatedAt'],
             createdAt: results['dataValues']['createdAt'],
 
             theme: results['dataValues']['theme'],
             message: results['dataValues']['message'],
+            create: "Заметка создана"
         })
         //  console.log(results);
     }).catch(function (err) {
