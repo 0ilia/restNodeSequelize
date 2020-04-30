@@ -121,8 +121,8 @@ app.post("/addUser", function (req, res) {
                         }).catch(function (err) {
                               //  console.log(err);
                                 res.status(200).json({
-                                   // messageError: err['errors'][0]['message'],
-                                    messageError: err['parent']['sqlMessage'],
+                                    messageError: err['errors'][0]['message'],
+                                    //messageError: err['parent']['sqlMessage'],
                                     register: false,
                                 });
                                 console.log(err['parent']['sqlMessage']);
