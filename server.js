@@ -2,7 +2,7 @@ const Sequelize = require("sequelize");
 const morgan = require("morgan");
 const express = require("express");
 const bodyParser = require("body-parser");
-const http = require("http");
+const https = require("https");
 const bcrypt = require('bcrypt');
 const port = process.env.PORT || 3005;
 
@@ -311,5 +311,5 @@ app.delete('/deleteNote/:id', (req, res, next) => {
 
 
 
-http.createServer(app).listen(port, () => console.log("Express server is running at port no http://127.0.0.1:" + port));
+https.createServer(app).listen(port, () => console.log("Express server is running at port no http://127.0.0.1:" + port));
 
