@@ -311,5 +311,5 @@ app.delete('/deleteNote/:id', (req, res, next) => {
 
 
 
-//http.createServer(app).listen(port, () => console.log("Express server is running at port no http://127.0.0.1:" + port));
+http.createServer(app).listen(port, () => console.log("Express server is running at port no http://127.0.0.1:" + port));
 
