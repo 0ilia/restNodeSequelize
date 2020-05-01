@@ -29,7 +29,7 @@ const User = sequelize.define("users", {
         allowNull: false,
         validate: {
             notNull: true,
-            len: [4,100]
+            len: [4, 100]
         }
     },
     email: {
@@ -37,7 +37,7 @@ const User = sequelize.define("users", {
         allowNull: false,
         validate: {
             notNull: true,
-            len: [5,140],
+            len: [5, 140],
             isEmail: true,
         },
     },
@@ -46,7 +46,7 @@ const User = sequelize.define("users", {
         allowNull: false,
         validate: {
             notNull: true,
-            len: [5,140],
+            len: [5, 140],
         },
 
     }
@@ -58,7 +58,7 @@ const Notes = sequelize.define("notes", {
         type: Sequelize.INTEGER,
         primaryKey: true,
         allowNull: false,
-        autoIncrement:true
+        autoIncrement: true
 
     },
     login: {
@@ -66,13 +66,13 @@ const Notes = sequelize.define("notes", {
         allowNull: false,
         validate: {
             notNull: true,
-            len: [4,100]
+            len: [4, 100]
         }
     },
     theme: {
         type: Sequelize.STRING,
     },
-    message:{
+    message: {
         type: Sequelize.STRING,
     }
 
@@ -84,7 +84,6 @@ sequelize.sync().then(result => {
     console.log("result");
 })
     .catch(err => console.log(err));
-
 
 
 app.use((req, res, next) => {
@@ -101,7 +100,7 @@ app.use((req, res, next) => {
 //Add User
 app.post("/addUser", function (req, res) {
 
-    if(req.body.login.trim().length >3 ) {
+    if (req.body.login.trim().length > 3) {
         if (req.body.password.length > 4) {
             if (req.body.confirmPassword === req.body.password) {
 
@@ -119,7 +118,7 @@ app.post("/addUser", function (req, res) {
                                 register: true,
                             })
                         }).catch(function (err) {
-                              //  console.log(err);
+                                //  console.log(err);
                                 res.status(200).json({
                                     messageError: err['errors'][0]['message'],
                                     //messageError: err['parent']['sqlMessage'],
@@ -147,7 +146,7 @@ app.post("/addUser", function (req, res) {
                 register: false,
             });
         }
-    }else {
+    } else {
         res.status(200).json({
             messageError: "Логин должен содержать минимум 4 символа",
             register: false,
@@ -160,15 +159,15 @@ app.get('/loginUser/:login/:password', (req, res, next) => {
 
 
     User.findOne({where: {login: req.params.login}})
-        .then(user=>{
-            if(!user) {
+        .then(user => {
+            if (!user) {
                 res.status(200).json({
                     //  messageError: err.sqlMessage,
                     messageError: "Логин или пароль введены неверно",
                     register: false,
                 });
-            }else {
-                if(req.params.login === user.login){
+            } else {
+                if (req.params.login === user.login) {
 
                     bcrypt.compare(req.params.password, user.password).then(function (result) {
 
@@ -186,7 +185,7 @@ app.get('/loginUser/:login/:password', (req, res, next) => {
                             });
                         }
                     });
-                }else {
+                } else {
                     res.status(200).json({
                         //  messageError: err.sqlMessage,
                         messageError: "Логин или пароль введены неверно",
@@ -197,7 +196,7 @@ app.get('/loginUser/:login/:password', (req, res, next) => {
                 console.log(user.login, user.password);
 
             }
-        }).catch(err=>console.log(err));
+        }).catch(err => console.log(err));
 
 });
 
@@ -205,50 +204,52 @@ app.get('/loginUser/:login/:password', (req, res, next) => {
 
 app.post('/addNote', (req, res, next) => {
     console.log(req.body.theme.trim());
-if(req.body.theme.trim()!==""||req.body.message.trim()!=="") {
-    Notes.create({
-        login: req.body.login,
-        theme: req.body.theme.trim(),
-        message: req.body.message.trim(),
-    }).then((results) => {
-        // console.log(results['dataValues']['updatedAt']);
-        res.status(200).json({
-            id: results['dataValues']['id'],
-            updatedAt: results['dataValues']['updatedAt'],
-            createdAt: results['dataValues']['createdAt'],
-
-            theme: results['dataValues']['theme'],
-            message: results['dataValues']['message'],
-            create: "Заметка создана"
-        })
-        //  console.log(results);
-    }).catch(function (err) {
+    if (req.body.theme.trim() !== "" || req.body.message.trim() !== "") {
+        Notes.create({
+            login: req.body.login,
+            theme: req.body.theme.trim(),
+            message: req.body.message.trim(),
+        }).then((results) => {
+            // console.log(results['dataValues']['updatedAt']);
             res.status(200).json({
-                messageError: err['dataValues']['message'],
-                message: "Error",
-            });
-            console.log(err['errors'][0]['message'])
-        }
-    )
-}
+                id: results['dataValues']['id'],
+                updatedAt: results['dataValues']['updatedAt'],
+                createdAt: results['dataValues']['createdAt'],
+
+                theme: results['dataValues']['theme'],
+                message: results['dataValues']['message'],
+                create: "Заметка создана"
+            })
+            //  console.log(results);
+        }).catch(function (err) {
+                res.status(200).json({
+                    messageError: err['dataValues']['message'],
+                    message: "Error",
+                });
+                console.log(err['errors'][0]['message'])
+            }
+        )
+    }
 });
 
 
 app.get('/getAllNotes/:login', (req, res, next) => {
 
-    Notes.findAll({where:{login: req.params.login },
+    Notes.findAll({
+        where: {login: req.params.login},
 
         order: [
             ['createdAt', 'DESC'],
 
         ],
-        raw: true })
-        .then(result=>{
+        raw: true
+    })
+        .then(result => {
             res.status(200).json({
                 //  messageError: err.sqlMessage ,
-                notes:result,
+                notes: result,
             });
-        }).catch(err=>console.log(err));
+        }).catch(err => console.log(err));
 
 });
 
@@ -256,40 +257,37 @@ app.get('/getAllNotes/:login', (req, res, next) => {
 app.put('/updateNote/:id', (req, res, next) => {
 
 
-
     (async function () {
-        await Notes.update({ theme: req.body.theme,message: req.body.message }, {
-            where: {
-                id: req.params.id
-            }
-        }).then(result=>{
-            /*  res.status(200).json({
-                  //  messageError: err.sqlMessage ,
-                  update:"Успешно",
-              });*/
+        if (req.body.theme.trim() !== "" || req.body.message.trim() !== "") {
+            await Notes.update({theme: req.body.theme, message: req.body.message}, {
+                where: {
+                    id: req.params.id
+                }
+            }).then(result => {
+                /*  res.status(200).json({
+                      //  messageError: err.sqlMessage ,
+                      update:"Успешно",
+                  });*/
 
-        }).catch(err=>console.log(err));
+            }).catch(err => console.log(err));
 
 
+            Notes.findOne({where: {id: req.params.id}})
+                .then(result => {
+                    console.log(result['dataValues']['updatedAt']);
+                    console.log(result['_previousDataValues']['updatedAt']);
+                    res.status(200).json({
+                        //  messageError: err.sqlMessage,
+                        update: "Заметка сохранена",
+                        updatedAt: result['dataValues']['updatedAt'],
+                    });
+                }).catch(err => console.log(err));
 
-        Notes.findOne({where: {id: req.params.id}})
-            .then(result=>{
-                console.log(result['dataValues']['updatedAt']);
-                console.log(result['_previousDataValues']['updatedAt']);
-                res.status(200).json({
-                    //  messageError: err.sqlMessage,
-                    update:"Заметка сохранена",
-                    updatedAt:result['dataValues']['updatedAt'],
-                });
-            }).catch(err=>console.log(err));
-
+        }
     }());
 
 
 });
-
-
-
 
 
 app.delete('/deleteNote/:id', (req, res, next) => {
@@ -298,17 +296,15 @@ app.delete('/deleteNote/:id', (req, res, next) => {
         where: {
             id: req.params.id
         }
-    }).then(result=>{
+    }).then(result => {
         res.status(200).json({
             //  messageError: err.sqlMessage ,
-            delete:"Заметка удалена",
+            delete: "Заметка удалена",
         });
-    }).catch(err=>console.log(err));
-
+    }).catch(err => console.log(err));
 
 
 });
-
 
 
 http.createServer(app).listen(port, () => console.log("Express server is running at port no http://127.0.0.1:" + port));
