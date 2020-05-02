@@ -223,7 +223,7 @@ app.post('/addNote', (req, res, next) => {
             //  console.log(results);
         }).catch(function (err) {
                 res.status(200).json({
-                    create: err['dataValues'][0]['message'],
+                    create: err['errors'][0]['message'],
                  //   message: "Error",
                 });
                 console.log(err['errors'][0]['message'])
