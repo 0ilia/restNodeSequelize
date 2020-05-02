@@ -203,7 +203,6 @@ app.get('/loginUser/:login/:password', (req, res, next) => {
 //add Notes
 
 app.post('/addNote', (req, res, next) => {
-    console.log(req.body.theme.trim());
     if (req.body.theme.trim() !== "" || req.body.message.trim() !== "") {
         Notes.create({
             login: req.body.login,
@@ -223,12 +222,15 @@ app.post('/addNote', (req, res, next) => {
             //  console.log(results);
         }).catch(function (err) {
                 res.status(200).json({
-                   // create: err['errors'][0]['message'],
                     create: err['errors'][0]['message'],
                 });
                 console.log(err['errors'][0]['message'])
             }
         )
+    }else {
+        res.status(200).json({
+            create: "Ошибка: заполните  поля(е)",
+        });
     }
 });
 
