@@ -224,7 +224,7 @@ app.post('/addNote', (req, res, next) => {
         }).catch(function (err) {
                 res.status(200).json({
                    // create: err['errors'][0]['message'],
-                    create: "err['errors'][0]['message']",
+                    create: err['errors'][0]['message'],
                 });
                 console.log(err['errors'][0]['message'])
             }
