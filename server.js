@@ -217,12 +217,10 @@ app.post('/addNote', (req, res, next) => {
 
                 theme: results['dataValues']['theme'],
                 message: results['dataValues']['message'],
-               // create: "Заметка создана"
+                create: "Заметка создана"
             })
-            //  console.log(results);
         }).catch(function (err) {
                 res.status(200).json({
-                   // create: err['errors'][0]['message'],
                     create: err['errors'][0]['message'],
                 });
                 console.log(err['errors'][0]['message'])
