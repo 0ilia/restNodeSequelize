@@ -20,7 +20,7 @@ const sequelize = new Sequelize("tester", "root", "", {
 });*/
 
 
-const sequelize = new Sequelize("postgres://xwhmpldlhusfgh:ff6ed43dbe792ee22c4ad3afdf1298f5d3c31fe02b806c0c17402fca204750c8@ec2-46-137-177-160.eu-west-1.compute.amazonaws.com:5432/dcin0kp4clkf99");
+const sequelize = new Sequelize("postgres://eclzdoizuolghg:ad0d4f68a06ea42c0f0b6098d2784c61471fb8554ade2b0820d4ba400dcfaf76@ec2-54-75-229-28.eu-west-1.compute.amazonaws.com:5432/db0h6d6d9rkovn");
 
 const User = sequelize.define("users", {
     login: {
