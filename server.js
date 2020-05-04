@@ -77,8 +77,6 @@ const Notes = sequelize.define("notes", {
     },
 
 
-}, {
-    timestamps: false
 });
 
 User.hasMany(Notes, {foreignKey: 'login'});
