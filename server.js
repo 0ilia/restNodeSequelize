@@ -74,8 +74,11 @@ const Notes = sequelize.define("notes", {
     },
     message: {
         type: Sequelize.STRING,
-    }
+    },
 
+
+}, {
+    timestamps: false
 });
 
 User.hasMany(Notes, {foreignKey: 'login'});
