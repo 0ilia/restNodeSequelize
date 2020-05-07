@@ -20,7 +20,7 @@ const sequelize = new Sequelize("tester", "root", "", {
 });*/
 
 
-const sequelize = new Sequelize("postgres://eclzdoizuolghg:ad0d4f68a06ea42c0f0b6098d2784c61471fb8554ade2b0820d4ba400dcfaf76@ec2-54-75-229-28.eu-west-1.compute.amazonaws.com:5432/db0h6d6d9rkovn");
+const sequelize = new Sequelize("postgres://dxxvygmwbayrvz:c597caa441805314c373329c7a5ce350b73e1ce1f6e4ef88a81418378be789a1@ec2-46-137-177-160.eu-west-1.compute.amazonaws.com:5432/d1akeuhvh055t2");
 
 const User = sequelize.define("users", {
     login: {
@@ -204,6 +204,7 @@ app.get('/loginUser/:login/:password', (req, res, next) => {
 //add Notes
 
 app.post('/addNote', (req, res, next) => {
+
     if (req.body.theme.trim() !== "" || req.body.message.trim() !== "") {
         Notes.create({
             login: req.body.login,
